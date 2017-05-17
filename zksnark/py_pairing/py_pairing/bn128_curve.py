@@ -96,7 +96,7 @@ def twist(pt):
     if pt is None:
         return None
     _x, _y = pt
-    # Field isomorphism from Z[p] / x**2 to Z[p] / x**2 - 18*x + 82
+    # Field isomorphism from Z[p] / x**2 + 1 to Z[p] / x**2 - 18*x + 82
     xcoeffs = [_x.coeffs[0] - _x.coeffs[1] * 9, _x.coeffs[1]]
     ycoeffs = [_y.coeffs[0] - _y.coeffs[1] * 9, _y.coeffs[1]]
     # Isomorphism into subfield of Z[p] / w**12 - 18 * w**6 + 82,

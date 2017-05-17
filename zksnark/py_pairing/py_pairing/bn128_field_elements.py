@@ -9,10 +9,20 @@ except:
 
 # The prime modulus of the field
 field_modulus = 21888242871839275222246405745257275088696311157297823662689037894645226208583
+# 有限域的元素个数为素数，或者是素数的 n 次方幂
+# 有限域 GF(p) 中的任何一个元素 x 均满足：x ^ p == x (mod p)
 # See, it's prime!
 assert pow(2, field_modulus, field_modulus) == 2
 
+# See x ^ p == x
+assert pow(192, field_modulus, field_modulus) == 192
+
 # The modulus of the polynomial in this representation of FQ12
+# 扩展素数域 GF(p) 的时候，首先找到 GF(p) 上的一个 primitive polynomial (also irreducible)
+# 代表 x^12 - 18*x^16 + 82，此多项式是不可约的 (irreducible polynomial) 并且是 primitive
+# 扩展素数域 GF(p^12) 可以表示为一个 12 元组，其中的每一个元素位于有限域 GF(p) 中
+# GF(p^12) = GF(p)[x] / (x^12 - 18*x^16 + 82)，其中 GF(p)[x] 代表任何可能的多项式
+
 FQ12_modulus_coeffs = [82, 0, 0, 0, 0, 0, -18, 0, 0, 0, 0, 0] # Implied + [1]
 
 # Extended euclidean algorithm to find modular inverses for
@@ -135,7 +145,7 @@ def poly_rounded_div(a, b):
 
 # A class for elements in polynomial extension fields
 class FQP():
-    def __init__(self, coeffs, modulus_coeffs): 
+    def __init__(self, coeffs, modulus_coeffs):
         assert len(coeffs) == len(modulus_coeffs)
         self.coeffs = [FQ(c) for c in coeffs]
         # The coefficients of the modulus, without the leading [1]
