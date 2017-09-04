@@ -52,5 +52,5 @@ if __name__ == "__main__" :
     getAccountInfoByStateRoot(sys.argv[1].decode("hex"), "")
     for key in accountHash2content :
         print key + " : ",
-        print accountHash2content[key]
+        print repr(accountHash2content[key])
         print
