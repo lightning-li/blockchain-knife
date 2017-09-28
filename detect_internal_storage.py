@@ -10,16 +10,23 @@ db = leveldb.LevelDB("/Users/likang/private_ethereum/ss_ethereum/geth/chaindata"
 
 accountHash2content = {}
 
+def getAccountInfoByAddress(st, addr) :
+    if len(addr) == 42 :
+        addr = addr[2:]
+    elif len(addr) != 40 :
+        return
+    
+    getAccountInfoByStateRoot(st.decode("hex"), "")
+    if accountHash2content.has_key(utils.sha3(addr.decode("hex")).encode("hex")) :
+        return accountHash2content[utils.sha3(addr.decode("hex")).encode("hex")]
+    else :
+        return
+
 def getAccountInfoByStateRoot(st, key) :
     #print "root : " + st.encode("hex")
     root_node = rlp.decode(db.Get(st))
 
     if len(root_node) == 2 :
-        # the last bit of first hex represent whether adding 0x0
-        # if the last bit is 1, represent not adding 0x0
-        # the last second bit of first hex represent node_type
-        # if it's 1, represent leaf. if not, represent extension_node
-
         if root_node[0][0].encode("hex")[0] == "2" :
             key += root_node[0].encode("hex")[2:]
             accountHash2content[key] = rlp.decode(root_node[1])
@@ -48,9 +55,37 @@ def getAccountInfoByStateRoot(st, key) :
             getAccountInfoByStateRoot(root_node[16], key)
         
 if __name__ == "__main__" :
+    
+    if len(sys.argv) != 3 and len(sys.argv) != 4 :
+        sys.exit("arguments number is not 3 and  4")
 
-    getAccountInfoByStateRoot(sys.argv[1].decode("hex"), "")
-    for key in accountHash2content :
-        print key + " : ",
-        print repr(accountHash2content[key])
-        print
+    if len(sys.argv) == 3 :
+        assert sys.argv[1] == "all"
+        if len(sys.argv[2])  == 66 :
+            st = sys.argv[2][2:]
+        elif len(sys.argv[2]) == 64 :
+            st = sys.argv[2]
+        else :
+            sys.exit()
+
+        getAccountInfoByStateRoot(st.decode("hex"), "")
+        for key in accountHash2content :
+            print key + " : ",
+            print repr(accountHash2content[key])
+            print
+
+    else :
+        assert sys.argv[1] == "one"
+        if len(sys.argv[2]) == 66 :
+            st = sys.argv[2][2:]
+        elif len(sys.argv[2]) == 64 :
+            st = sys.argv[2]
+        else :
+            sys.exit()
+        if len(sys.argv[3]) == 42 :
+            account = sys.argv[3][2:]
+        elif len(sys.argv[3]) == 40 :
+            account = sys.argv[3]
+        else :
+            sys.exit()
+        print repr(getAccountInfoByAddress(st, account))
